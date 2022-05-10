@@ -1,0 +1,40 @@
+name: clean_arch_project
+description: A new Flutter project.
+
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.16.2 <3.0.0"
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons:
+  http:
+  provider:
+  equatable:
+  get:
+  flutter_secure_storage:
+  localstorage:
+  carousel_slider:
+  intl:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons:
+  test:
+  mockito:
+  faker:
+  image_test_utils:
+
+
+flutter:
+
+
+  uses-material-design: true
+
+
