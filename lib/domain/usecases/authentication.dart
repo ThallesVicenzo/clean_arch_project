@@ -15,5 +15,4 @@ class AuthenticationParams{
   @required this.secret,
 });
 
-  Map toJason() => {'email': email, 'password': secret};
 }
