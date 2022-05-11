@@ -1,37 +1,60 @@
 import 'package:test/test.dart';
 import 'package:faker/faker.dart';
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:mockito/mockito.dart';
 import 'package:meta/meta.dart';
 
+import 'package:clean_arch_project/usecases/authentication.dart';
 
 class RemoteAuthentication {
-  final HttpClient httpClient;
-  final String url;
+  final HttpClient? httpClient;
+  final String? url;
 
-  RemoteAuthentication({required this.httpClient, required this.url});
+  RemoteAuthentication({@required this.httpClient, @required this.url});
 
-  Future<void> auth() async {
-    await httpClient.request(url: url);
+  Future<void>? auth(AuthenticationParams params) async {
+    final body = {'email': params.email, 'password': params.secret};
+    await httpClient?.request(url: url, method: 'post', body: body);
   }
 }
 
-abstract class HttpClient{
-  Future<void> request({
-    @required String url
+abstract class HttpClient {
+  Future<void>? request({
+    required String? url,
+    required String? method,
+    Map body
   });
 }
 
-class HttpClientSpy extends Mock implements HttpClient{}
+class HttpClientSpy extends Mock implements HttpClient {}
 
 void main() {
+  RemoteAuthentication? sut;
+  HttpClientSpy? httpClient;
+  String? url;
+
+  setUp(() {
+    httpClient = HttpClientSpy();
+    url = faker.internet.httpUrl();
+    sut = RemoteAuthentication(
+      httpClient: httpClient,
+      url: url,
+    );
+  });
+
   test('Should call HttpClient with correct URL', () async {
-    final HttpClient = HttpClientSpy();
-    final url = faker.internet.httpUrl();
-    final sut = RemoteAuthentication(httpClient: HttpClient, url: url);
+    final params = AuthenticationParams(
+        email: faker.internet.email(), secret: faker.internet.password());
+    await sut?.auth(params);
 
-    await sut.auth();
-
-    verify(HttpClient.request(url: url));
+    verify(
+      httpClient?.request(
+        url: url,
+        method: 'post',
+        body: {
+          'email': params.email,
+          'password': params.secret,
+        },
+      ),
+    );
   });
 }
