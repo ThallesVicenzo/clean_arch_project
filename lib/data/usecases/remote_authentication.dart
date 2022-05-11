@@ -1,4 +1,3 @@
-
 import 'package:meta/meta.dart';
 
 import '/domain/usecases/usecases.dart';
@@ -14,16 +13,17 @@ class RemoteAuthentication {
 
   Future<void>? auth(AuthenticationParams params) async {
     final body = RemoteAuthenticationParams.fromDomain(params).toJason();
-    try{
+    try {
       await httpClient?.request(
         url: url,
         method: 'post',
         body: body,
       );
-    } on HttpError{
-      throw DomainError.unexpected;
+    } on HttpError catch (error) {
+      throw error == HttpError.unauthorized
+          ? DomainError.invalidCredencials
+          : DomainError.unexpected;
     }
-
   }
 }
 
