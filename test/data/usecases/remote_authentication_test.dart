@@ -78,7 +78,7 @@ void main() {
 
     expect(future, throwsA(DomainError.invalidCredencials));
   });
-  
+
   test('Should return an account if HttpClient returns 200', () async {
     final validData = mockValidData();
 
