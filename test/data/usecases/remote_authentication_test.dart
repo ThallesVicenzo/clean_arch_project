@@ -54,6 +54,7 @@ void main() {
 
     expect(future, throwsA(DomainError.unexpected));
   });
+
   test('Should throw UnexpectedError if HttpClient returns 500', () async {
     when(
       httpClient?.request(
@@ -67,6 +68,7 @@ void main() {
 
     expect(future, throwsA(DomainError.unexpected));
   });
+
   test('Should throw InvalidCredentialsError if HttpClient returns 401',
       () async {
     when(
@@ -81,7 +83,6 @@ void main() {
 
     expect(future, throwsA(DomainError.invalidCredencials));
   });
-
   test('Should return an account if if HttpClient returns 200', () async {
     final accessToken = faker.guid.guid();
     when(
@@ -98,5 +99,22 @@ void main() {
     final account = await sut?.auth(params!);
 
     expect(account?.accessToken, accessToken);
+  });
+
+  test('Should throw UnexpectedError if HttpClient returns 200 with invalid data', () async {
+    when(
+      httpClient?.request(
+        url: anyNamed('url'),
+        method: anyNamed('method'),
+        body: anyNamed('body'),
+      ),
+    ).thenAnswer(
+          (_) async =>
+      {'invalid_key': 'invalid_value'},
+    );
+
+    final future = sut?.auth(params!);
+
+    expect(future, throwsA(DomainError.unexpected));
   });
 }

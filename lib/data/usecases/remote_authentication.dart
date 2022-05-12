@@ -13,15 +13,15 @@ class RemoteAuthentication {
 
   RemoteAuthentication({required this.httpClient, required this.url});
 
-  Future<RemoteAccountModel> auth(AuthenticationParams params) async {
-    final body = RemoteAuthenticationParams.fromDomain(params).toJason();
+  Future<AccountEntity>? auth(AuthenticationParams params) async {
+    final body = RemoteAuthenticationParams.fromDomain(params).toJson();
     try {
       final Map? httpResponse = await httpClient?.request(
         url: url,
         method: 'post',
         body: body,
       );
-      return RemoteAccountModel.fromJson(httpResponse!);
+      return RemoteAccountModel.fromJson(httpResponse!).toEntity();
     } on HttpError catch (error) {
       throw error == HttpError.unauthorized
           ? DomainError.invalidCredencials
@@ -45,5 +45,5 @@ class RemoteAuthenticationParams {
         password: params.secret,
       );
 
-  Map toJason() => {'email': email, 'password': password};
+  Map toJson() => {'email': email, 'password': password};
 }
