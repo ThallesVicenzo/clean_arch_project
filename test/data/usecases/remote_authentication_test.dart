@@ -1,4 +1,3 @@
-
 import 'package:test/test.dart';
 import 'package:faker/faker.dart';
 import 'package:mockito/mockito.dart';
@@ -26,21 +25,6 @@ void main() {
     );
     params = AuthenticationParams(
         email: faker.internet.email(), secret: faker.internet.password());
-  });
-
-  test('Should call HttpClient with correct URL', () async {
-    await sut?.auth(params!);
-
-    verify(
-      httpClient?.request(
-        url: url,
-        method: 'post',
-        body: {
-          'email': params?.email,
-          'password': params?.secret,
-        },
-      ),
-    );
   });
 
   test('Should throw UnexpectedError if HttpClient returns 400', () async {
@@ -83,7 +67,8 @@ void main() {
 
     expect(future, throwsA(DomainError.unexpected));
   });
-  test('Should throw InvalidCredentialsError if HttpClient returns 401', () async {
+  test('Should throw InvalidCredentialsError if HttpClient returns 401',
+      () async {
     when(
       httpClient?.request(
         url: anyNamed('url'),
@@ -95,5 +80,23 @@ void main() {
     final future = sut?.auth(params!);
 
     expect(future, throwsA(DomainError.invalidCredencials));
+  });
+
+  test('Should return an account if if HttpClient returns 200', () async {
+    final accessToken = faker.guid.guid();
+    when(
+      httpClient?.request(
+        url: anyNamed('url'),
+        method: anyNamed('method'),
+        body: anyNamed('body'),
+      ),
+    ).thenAnswer(
+      (_) async =>
+          {'accessToken': accessToken, 'name': faker.person.name()},
+    );
+
+    final account = await sut?.auth(params!);
+
+    expect(account?.token, accessToken);
   });
 }
